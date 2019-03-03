@@ -39,7 +39,7 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 @app.route("/")
 def index():
-    return render_template("upload.html")
+    return render_template("up.html")
 
 
 
@@ -240,7 +240,7 @@ def upload():
     currentDT = datetime.datetime.now()
     time = currentDT.strftime("%Y-%m-%d %H:%M:%S")
     insertData(time, filename, ret)
-    return render_template("complete.html", random_number=predint[0])
+    return render_template("com.html", random_number=predint[0])
 
 
         
