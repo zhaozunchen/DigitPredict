@@ -66,6 +66,8 @@ in this example, predict1.0 is running on 0.0.0.0:8000
 
 Copy and past 0.0.0.0:8000 as URL into browser, then you will see the webpage that you can submit handwriting digit. The result will show on the webpage. 
 
+Note:  Digit photo has to be black text on a white background. 
+
 You can check the predict result in Cassandra that you created before by using cqlsh command:
 
 ```select * from keyspacetest.mytable ;```
