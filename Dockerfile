@@ -17,7 +17,7 @@ EXPOSE 8000 9042
 ENV NAME World
 
 # Run app.py when the container launches
-CMD ["python3.6", "predict_7.py"]
+CMD ["python3.6", "app.py"]
 
 
 

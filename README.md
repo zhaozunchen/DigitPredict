@@ -1,66 +1,76 @@
 # TensorFlow<sup>TM</sup> MNIST predict [Recognise Handwritten Digits]
 
 ### Overview
-This project uses the MNIST tutorials from the TensorFlow website. The two tutorials, the beginner tutorial and the expert tutorial, use different deep learning models. The python scripts ending with _1 use the model from the beginner tutorial. The scripts ending with _2 use the model from the advanced tutorial. As expected scripts using the model from the expert tutorial give better results.
+This project aimed at applying MNIST dataset to data containers, identifying values of digital photos of handwriting provided by users, returning the results to users and store them in Cassandra.
 
-This projects consists of four scripts: 
+Four important things you have to know about this project: 
 
-1. _create_model_1.py_ – creates a model model.ckpt file based on the beginners tutorial.
-2. *create_model_1.py* – creates a model model2.ckpt file based on the expert tutorial.
-3. *predict_1.py* – uses the model.ckpt (beginners tutorial) file to predict the correct integer form a handwritten number in a .png file.
-4. *predict_2.py* – uses the model2.ckpt (expert tutorial) file to predict the correct integer form a handwritten number in a .png file.
+1. *model2.ckpt* – model2.ckpt is a trained model based on the MNIST tutorials from TensorFlow website for digit recognizing.
+2. *predict_7.py* – The main python code of this project including digit recognizing, creating keyspace and inserting data into Cassandra.
+3. *Dockerfile* – uses Dockerfile to assemble an image of application which predicts the correct integer from a handwritten number.
+4. *docker-compose.yml* – uses the docker-compose.yml file to initial the image of Cassandra database.
 
-### Dependencies
-The following Python libraries are required.
 
-- sys - should be installed by default
-- tensorflow - [TensorFlow](https://www.tensorflow.org/)
-- PIL – [Pillow](http://pillow.readthedocs.org)
+### Installing Docker
+At the beginning, Docker needs to be installed as driver. 
 
-### Installing TensorFlow
-Of course TensorFlow needs to be installed. The [TensorFlow website](https://www.tensorflow.org/versions/master/get_started/index.html) has a good manual .
+Following [Docker for Mac](https://docs.docker.com/docker-for-mac/) to install on mac .
 
-### Installing Python Image Library (PIL)
-The Python Image Library (PIL) is no longer available. Luckily there is a good fork called Pillow. Installing is as easy as:
+Following [Docker for Windows](https://docs.docker.com/docker-for-windows/) to install on Windows .
 
-```sudo pip install Pillow```
-
-Or look at the [Pillow documentation ](http://pillow.readthedocs.org) for other installation options.
-
-### The python scripts
-The easiest way the use the scripts is to put all four scripts in the same folder. If TensorFlow is installed correctly the images to train the model are downloaded automatically. 
 
 ## Running
 Running is based on the steps:
+1. Create user-defined net work on Docker
+2. creating and running Cassandra image
+3. creating and running digit recognizing image
+4. submit digit photo on browser to predict handwriting number. 
 
-1. create the model file
-2. create an image file containing a handwritten number
-3. predict the integer 
+### 1. Create user-defined net work on Docker
+Use command below to define the network name as my-net which will be used by following steps. This allows containerized applications to communicate with each other easily, without accidentally opening access to the outside world. 
 
-### 1. create the model file
-The easiest way is to cd to the directory where the python files are located. Then run:
+```$ docker network create my-net```
 
-```python create_model_1.py```
+### 2. creating and running Cassandra image
+The easiest way is to cd to the directory where this project files are located. Then run:
 
-or
+```$ docker-compose up -d```
 
-```python create_model_2.py```
+to create a Cassandra image. 
+After creating Cassandra database image, it is time to run the database container. You can use the cqlsh tool included in container to check your key space using the following commands:
 
-to create the model based on the MNIST beginners tutorial (model_1) or the model based on the expert tutorial (model_2).
+```$ docker exec -it cassandratable cqlsh```
 
-### 2. create an image file
-You have to create a PNG file that contains a handwritten number. The background has to be white and the number has to be black. Any paint program should be able to do this. Also the image has to be auto cropped so that there is no border around the number.
 
-### 3. predict the integer
-The easiest way again is to put the image file from the previous step (step 2) in the same directory as the python scripts and cd to the directory where the python files are located. 
+### 3. creating and running digit recognizing image
 
-The predict scripts require one argument: the file location of the image file containing the handwritten number. For example when the image file is ‘number1.png’ and is in the same location as the script, run:
+Now, opening a new terminal window and cd to the directory where this project files are located. Then run:
 
-```python predict_1.py number1.png```
+```$ docker build --tag=predict:1.0 .``` 
 
-or
+this command will build an application image from Dockerfile. You can change the name and tag as you want, in this example, the image is named as "predict:1.0". 
 
-```python predict_2.py number1.png```
+It will take you a few minutes to build an image. After building up, then run: 
 
-The first script, predict_1.py, uses the model.ckpt file created by the create_model_1.py script. The second script, predict_2.py, uses the model2.ckpt file created by the create_model_2.py script. 
+```$ docker run -p 8000:8000 --network=my-net -itd --name=predict1.0 predict:1.0```
+
+This command will run the container upon the image you created above on Port 8000. Note: you cannont change the network's name, but you can change the container's name as you want. (In this example, predict1.0 is container's name)
+
+### 4. submit digit photo on browser to predict handwriting number. 
+
+You can check the Port that the predict1.0 is running on by using the command: 
+
+```$ docker ps```
+
+in this example, predict1.0 is running on 0.0.0.0:8000
+
+Copy and past 0.0.0.0:8000 as URL into browser, then you will see the webpage that you can submit handwriting digit. The result will show on the webpage. 
+
+You can check the predict result in Cassandra that you created before by using cqlsh command:
+
+```select * from keyspacetest.mytable ;```
+
+
+
+
 
