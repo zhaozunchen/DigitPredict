@@ -1,4 +1,4 @@
-# TensorFlow<sup>TM</sup> MNIST predict [Recognise Handwritten Digits]
+# MNIST-Cassandra-Docker
 
 ### Overview
 This project aimed at applying MNIST dataset to data containers, identifying values of digital photos of handwriting provided by users, returning the results to users and store them in Cassandra.
